@@ -1,12 +1,24 @@
-export default async function handler(req, res) {
+module.exports = async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
-  const { name, theme } = req.body;
+  const { name, theme } = req.body || {};
 
   if (!name || !theme) {
     return res.status(400).json({ error: 'Navn og tema er påkrevd' });
+  }
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return res.status(500).json({ error: 'API-nøkkel mangler' });
   }
 
   const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -27,9 +39,10 @@ export default async function handler(req, res) {
   });
 
   if (!response.ok) {
-    return res.status(500).json({ error: 'Klarte ikke å generere vits' });
+    const err = await response.text();
+    return res.status(500).json({ error: 'Klarte ikke å generere vits', details: err });
   }
 
   const data = await response.json();
   res.status(200).json({ joke: data.content[0].text });
-}
+};
