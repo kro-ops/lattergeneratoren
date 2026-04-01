@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "msedge",
+            "request": "launch",
+            "name": "Open index.html",
+            "url": "file:///c:/Users/erikb/OneDrive/Lattergeneratoren/index.html",
+            "webRoot": "c:\\Users\\erikb\\OneDrive\\Lattergeneratoren"
+        }
+    ]
+}
