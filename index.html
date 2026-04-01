@@ -224,10 +224,17 @@
       display: none;
       gap: 10px;
       margin-bottom: 20px;
+      flex-wrap: wrap;
     }
 
     .personal-inputs.visible {
       display: flex;
+    }
+
+    @media (max-width: 480px) {
+      .personal-inputs {
+        flex-direction: column;
+      }
     }
 
     .personal-inputs input {
