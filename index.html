@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lattergeneratoren</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 24px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    header .emoji {
+      font-size: 3.5rem;
+      display: block;
+      margin-bottom: 10px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    header h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.5px;
+      text-shadow: 0 2px 20px rgba(255, 200, 50, 0.4);
+    }
+
+    header p {
+      color: #a0b4cc;
+      font-size: 1rem;
+      margin-top: 8px;
+    }
+
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 24px;
+      padding: 36px 40px;
+      width: 100%;
+      max-width: 620px;
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+      align-items: center;
+    }
+
+    .category-label {
+      color: #a0b4cc;
+      font-size: 0.85rem;
+      font-weight: 600;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    select {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 0.95rem;
+      padding: 10px 16px;
+      cursor: pointer;
+      outline: none;
+      transition: border-color 0.2s, background 0.2s;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a0b4cc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 36px;
+    }
+
+    select:focus,
+    select:hover {
+      border-color: rgba(255, 200, 50, 0.5);
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+
+    select option {
+      background: #16213e;
+      color: #fff;
+    }
+
+    .joke-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 28px;
+      min-height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .joke-box.flash {
+      animation: flash 0.35s ease;
+    }
+
+    @keyframes flash {
+      0% { opacity: 1; }
+      30% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    .joke-text {
+      color: #f0f4f8;
+      font-size: 1.15rem;
+      line-height: 1.7;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .joke-text.placeholder {
+      color: #4a6080;
+      font-style: normal;
+      font-size: 1rem;
+    }
+
+    .category-badge {
+      position: absolute;
+      top: -10px;
+      left: 20px;
+      background: linear-gradient(90deg, #f7b733, #fc4a1a);
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .category-badge.visible {
+      opacity: 1;
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      flex: 1;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s, opacity 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    .btn-joke {
+      background: linear-gradient(135deg, #f7b733, #fc4a1a);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(252, 74, 26, 0.35);
+    }
+
+    .btn-joke:hover {
+      box-shadow: 0 6px 28px rgba(252, 74, 26, 0.5);
+    }
+
+    .btn-copy {
+      background: rgba(255, 255, 255, 0.08);
+      color: #a0b4cc;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      flex: 0 0 auto;
+      padding: 14px 20px;
+    }
+
+    .btn-copy:hover {
+      background: rgba(255, 255, 255, 0.14);
+      color: #fff;
+    }
+
+    .btn-copy.copied {
+      background: rgba(50, 200, 120, 0.2);
+      color: #5eead4;
+      border-color: rgba(94, 234, 212, 0.3);
+    }
+
+    footer {
+      margin-top: 32px;
+      color: #3a5070;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <span class="emoji">😂</span>
+    <h1>Lattergeneratoren</h1>
+    <p>Klikk, le og gjenta.</p>
+  </header>
+
+  <div class="card">
+    <div class="controls">
+      <span class="category-label">Kategori</span>
+      <select id="categorySelect">
+        <option value="alle">Alle</option>
+        <option value="barna">Alle barna</option>
+        <option value="kari">Kari-Kari</option>
+        <option value="bedre">Det er bedre..</option>
+        <option value="blondine">Blondinevitser</option>
+        <option value="horthom">Har du hørt om..</option>
+        <option value="religiose">Religiøse vitser</option>
+      </select>
+    </div>
+
+    <div class="joke-box" id="jokeBox">
+      <span class="category-badge" id="categoryBadge"></span>
+      <p class="joke-text placeholder" id="jokeText">Trykk på knappen for å få en vits!</p>
+    </div>
+
+    <div class="actions">
+      <button class="btn-joke" id="jokeBtn" onclick="nyVits()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        Ny vits
+      </button>
+      <button class="btn-copy" id="copyBtn" onclick="kopierVits()" title="Kopier vitsen">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        Kopier
+      </button>
+    </div>
+  </div>
+
+  <footer>Laget med glede &mdash; og litt latter.</footer>
+
+  <script>
+    const vitser = {
+      barna: [
+        "Hva kaller du en bjørn uten tenner? En tannbørste!",
+        "Hva sier en ku på engelsk? Moooo-ning!",
+        "Hva er forskjellen på en elefant og en postkasse? Vet du ikke det, da sender jeg aldri brevet med deg!",
+        "Hva kaller du en sove-dinosaur? En T-snoreksuks!",
+        "Hva er grønt og hopper? En frosk. Hva er grønt, hopper og er full av vann? En frosk med tette mandler.",
+        "Hva sier en nøkkel til en lås? Du åpner hjertet mitt!",
+        "Hva er svart, hvit og leses? En avis! Hva er svart, hvit og leses på nytt? En utslitt avis!",
+        "Hvorfor gikk katten til legen? Fordi den hadde katte-arr!",
+        "Hva kaller du en hund som kan trollbinde folk? En labra-doodle!",
+        "Hva er verdens raskeste kake? Scones – de er alltid i farta!",
+        "Banker på. Hvem er der? Avbryt. Avbryt hv– AVBRYT HVEM ER DER?!",
+        "Hva sier en nulltoleranse-lærer til en tullekopp? Ikke tull med meg!",
+        "Hva er felles mellom et spøkelse og en lyver? Begge er gjennomsiktige!",
+        "Hva er et spøkelses favorittdessert? Iskrem – den er alltid kald!",
+        "Hva heter den morsomste planeten? Ha-Saturn!",
+        "Hva kaller du en fisk uten øyne? En fsk!",
+        "Hva er forskjellen på en lærer og et tog? Toget sier «chu-chu» og læreren sier «tyst-tyst».",
+        "Hva er verdens tyngste bok? En matematikkbok – full av tunge problemer!",
+        "Hva sa havet til stranden? Ingenting – det bare vinka.",
+        "Hva er grønt og farlig? En sint agurk.",
+        "Hva kaller du en hund i en snøstorm? En kuldehund!",
+        "Hva kaller du en bjørn som er i dårlig humør? Grettbjørn!",
+        "Hva kaller du en ku som spiller gitar? En moo-siker!",
+        "Hvorfor er skolebøker alltid triste? Fordi de er fulle av problemer.",
+        "Hva sier en vits om pizza? Slice to meet you!",
+        "Legen: «Ta pust.» Pasienten puster. Legen: «Og ut.» Pasienten: «Og hva nå?» Legen: «Fortsett slik resten av livet.»",
+        "Hva kaller du et tog fullt av tyggegummi? Et kjæke-tog!",
+        "Hva er det som er hvitt og ikke kan klatre i trær? Et kjøleskap.",
+        "Hva kaller du en snømann som lyver? En løgnsnø!",
+      ],
+      kari: [
+        "En mann brøt seg inn i dusjen til Kari-Kari, men Kari-Kari lo bare – for det var ikke nok sjampo til dem begge.",
+        "En mann rev klærne av Kari-Kari, men Kari-Kari lo bare – for de passet ikke ham likevel.",
+        "Kari-Kari mistet kontroll på barnevognen i en bratt bakke, men Kari-Kari lo bare – for det stod et STOPP-skilt på bunnen.",
+        "En fremmed fulgte etter Kari-Kari inn i parkeringshuset, men Kari-Kari lo bare – for han hadde parkert der selv og ikke husket hvilken etasje.",
+        "En innbruddstyv gjemte seg under sengen til Kari-Kari, men Kari-Kari lo bare – for støvet der nede ville gi ham nys hele natten.",
+        "En mann klatret opp stigen til Kari-Karis soveromsvinduer, men Kari-Kari lo bare – for stigen var to meter for kort.",
+        "En fremmed presset Kari-Kari opp mot veggen på T-banen, men Kari-Kari lo bare – for han hadde glemt å stemple billett.",
+        "En mann låste Kari-Kari inne på kontoret, men Kari-Kari lo bare – for han hadde glemt at hun hadde reservenøkkel.",
+        "Kari-Kari ble forfulgt av en mystisk mann gjennom skogen, men Kari-Kari lo bare – for han hadde hvite sokker til sandaler.",
+        "En mann sneg seg inn til Kari-Kari om natten, men Kari-Kari lo bare – for han snublet over katten og vekket hele nabolaget.",
+        "En fremmed satt og stirret på Kari-Kari hele togturen, men Kari-Kari lo bare – for han hadde sittet på en banan uten å vite det.",
+        "En mann fulgte etter Kari-Kari helt hjem, men Kari-Kari lo bare – for han gikk inn i feil oppgang.",
+        "En mann ventet på Kari-Kari i mørket, men Kari-Kari lo bare – for han var gjennomvåt og hadde glemt paraplyen.",
+        "En fremmed tok Kari-Kari i hånden på T-banen, men Kari-Kari lo bare – for han trodde det var håndtaket.",
+        "En mann brøt seg inn i bilen til Kari-Kari, men Kari-Kari lo bare – for han hadde satt seg inn i feil bil.",
+        "En innbruddstyv prøvde å stjele håndvesken til Kari-Kari, men Kari-Kari lo bare – for hun hadde glemt den hjemme.",
+        "Kari-Kari ble stoppet av en mystisk mann i heisen, men Kari-Kari lo bare – for han hadde trykket på alle etasjene.",
+        "En fremmed satte seg i fanget på Kari-Kari på bussen, men Kari-Kari lo bare – for han trodde det var et ledig sete.",
+        "En mann fulgte etter Kari-Kari i supermarkedet, men Kari-Kari lo bare – for han hadde glemt kurven sin i frysedisken.",
+        "Kari-Kari ble låst ute av hotellet klokken tre om natten, men Kari-Kari lo bare – for resepsjonisten sov med munnen åpen.",
+        "En mann prøvde å kysse Kari-Kari under misteltein, men Kari-Kari lo bare – for det var en papirfakkel fra julefesten.",
+        "En mann prøvde å snike seg inn bak Kari-Kari gjennom inngangsdøren, men Kari-Kari lo bare – for døren gikk den andre veien.",
+        "Kari-Kari oppdaget et kikkhull i garderoberommet, men Kari-Kari lo bare – for noen hadde limt fast et øye av plast der.",
+      ],
+      bedre: [
+        "Det er bedre å være full enn halvfull, sier glasset.",
+        "Det er bedre å le enn å gråte – men begge deler hjelper mot løk.",
+        "Det er bedre med en fugl i hånden enn ti på taket, sier katten.",
+        "Det er bedre å komme sent enn aldri – med mindre du er tannlegen din.",
+        "Det er bedre å gi enn å få – spesielt når det gjelder forkjølelse.",
+        "Det er bedre å tie og la folk tro du er dum, enn å åpne munnen og fjerne all tvil.",
+        "Det er bedre å elske og tape enn aldri å ha elsket – men det er ikke alltid like enkelt å forklare det til eksen.",
+        "Det er bedre å be om tilgivelse enn tillatelse – men noen ganger ender man med å be om begge deler.",
+        "Det er bedre å spise grønnsaker enn å se på dem råtne i kjøleskapet.",
+        "Det er bedre med dårlig dag på sjøen enn en god dag på jobben – men prøv å si det til sjefen din.",
+        "Det er bedre å stå opp tidlig enn å sove lenge – men det er lettere sagt enn gjort.",
+        "Det er bedre å smile enn å grine – men begge deler krymper rynkene feil vei.",
+        "Det er bedre med halvt brød enn ingen – men det er enda bedre med smør på.",
+        "Det er bedre å tenke seg om to ganger – men de fleste klarer knapt én.",
+        "Det er bedre å si unnskyld enn å ha rett – men riktig er riktig, uansett.",
+        "Det er bedre å leve i nuet enn å bekymre seg for fremtiden – sier fremtiden.",
+        "Det er bedre å feile og lære enn å lykkes og glemme – men det er lettere sagt enn gjort.",
+        "Det er bedre med en god venn enn ti bekjente – men på bursdagen din regner du alltid feil.",
+        "Det er bedre å ha en god plan enn ingen – men det er ikke alltid man har tid til begge deler.",
+        "Det er bedre å si for mye enn for lite – men det er sjelden noen er enige etterpå.",
+      ],
+      blondine: [
+        "Hvorfor tar en blondine med stige på jobben? Fordi hun har hørt at lønnen er skyhøy.",
+        "En blondine prøver å bygge et puslespill og er veldig stolt: \"Se, jeg klarte det på bare 6 måneder!\" Esken sa 2-4 år.",
+        "Hvorfor bruker ikke blondiner to pauser på jobben? Det tar for lang tid å lære seg alt på nytt etterpå.",
+        "En blondine ringer politiet: \"Noen har stjålet bilen min!\" Politiet: \"Var den låst?\" Blondinen: \"Nei, men jeg tok med rattet!\"",
+        "Hvorfor smiler blondiner under et lyn? De tror noen tar bilde av dem.",
+        "En blondine og en brunette hopper ut av et fly. Hvem lander først? Brunetten – blondinen måtte spørre om veien.",
+        "Hvorfor kan ikke blondiner spise is-krem? De mister den i ansiktet når de prøver å le av seg selv.",
+        "En blondine kjøper seg en ny radio. Selger: \"Den har AM og FM.\" Blondinen: \"Men hva med formiddag og ettermiddag?\"",
+        "Hvorfor bærer blondiner alltid høretelefoner? I tilfelle noen snakker fornuftig til dem.",
+        "En blondine søker jobb. Sjefen spør: \"Hva er dine svakheter?\" Blondinen: \"Jeg er nok for ærlig.\" Sjefen: \"Jeg ser ikke på det som en svakhet.\" Blondinen: \"Det bryr meg ikke hva du synes.\"",
+        "En blondine fyller ut jobbsøknad. Under «ønsket lønn» skriver hun: «Ja takk!»",
+        "Hvorfor tar blondiner med blyant i sengen? For å tegne drømmene sine.",
+        "En blondine ser et skilt: «Vei stengt». Hun snur og går hjem. Neste dag er skiltet borte. Hun lurer på hvor veien ble av.",
+        "Hvorfor kan ikke blondiner spille sjakk? Fordi de alltid prøver å slå kongen.",
+        "Hvorfor bruker blondiner solkrem om vinteren? For å unngå månebrenthet.",
+        "En blondine på kafé: «Kan jeg få en kaffe uten koffein?» Servitøren: «En decaf?» Blondinen: «Nei, bare uten koffein.»",
+        "Hvorfor tar blondiner med stige i badet? Fordi de har hørt om høyt skumspray.",
+        "En blondine sender brev. Skrankedamen: «Vil du ha det rekommandert?» Blondinen: «Ja – send det til Afrika.»",
+        "Hvorfor er blondiner gode på quiz? De trekker alltid et blankt.",
+        "En blondine på treningssenter: «Unnskyld, hvordan stopper jeg dette løpebåndet?» Instruktøren: «Bare trykk STOP.» Blondinen: «Åh! Jeg trodde det stod STÖP.»",
+      ],
+      horthom: [
+        "Har du hørt om mannen som spiste klokker? Det tok tid å fordøye.",
+        "Har du hørt om mannen som kjøpte en kamel? Han var gira på å skaffe seg en pukkel i karrieren.",
+        "Har du hørt om den blinde mannen som gikk inn i en fiskebutikk? Han sa \"God dag, damer!\"",
+        "Har du hørt om bakeren som var slem mot kundene? Han ble stekt levende av kritikerne.",
+        "Har du hørt om den kortsynte pianisten? Han spilte helt av noter.",
+        "Har du hørt om den treige bakeren? Det tok ham alltid en evighet å rulle i deigen.",
+        "Har du hørt om mannen som oppfant knekkebørd? Han ble knust av sin egen suksess.",
+        "Har du hørt om fisken som gikk til tannlegen? Den hadde vondt i finnene.",
+        "Har du hørt om fyren som prøvde å spise en kalender? Han fikk månedsdiaré.",
+        "Har du hørt om astronauten som ble sparken? Han ble sendt rett opp i luften.",
+        "Har du hørt om mannen som falt i en linsesuppe? Han ble reddet av en hjelpsom linse.",
+        "Har du hørt om elektrikeren som giftet seg? Det var kjærlighet ved første gnist.",
+        "Har du hørt om bakeren som ble millionær? Han hadde en god deig.",
+        "Har du hørt om mannen som ble begravet med mobilen sin? Det ringte ikke en gang.",
+        "Har du hørt om snekkeren som ble skuespiller? Han naglet rollen.",
+        "Har du hørt om gartneren som ble journalist? Han gravde alltid frem en god sak.",
+        "Har du hørt om mannen som drakk for mye lim? Han holdt det for seg selv.",
+        "Har du hørt om brannmannen som ble pensjonist? Han tennte aldri mer.",
+        "Har du hørt om klovnen som fikk sparken fra sirkuset? Det var ingen spøk.",
+        "Har du hørt om dykkeren som drakk for mye? Han var alltid dypt nede.",
+        "Har du hørt om mannen som kjøpte en bumerang? Han fikk alltid noe igjen for det.",
+        "Har du hørt om astronomen som ble kokk? Han laget alltid stjernemenyer.",
+        "Har du hørt om pianisten som slo seg? Han fikk en tangentsmekk.",
+      ],
+      religiose: [
+        "En mann ber: \"Kjære Gud, la meg vinne i lotto.\" Neste dag ber han igjen. Etter en uke hører han en stemme fra himmelen: \"Kjøp i det minste en lottolapp!\"",
+        "En prest spør en gammel mann: \"Tror du på livet etter døden?\" Mannen: \"Håper det, ja – det er det eneste som gjenstår av sparepengene mine.\"",
+        "En gutt spør presten: \"Hva skjer hvis man ber til Gud?\" Presten: \"Da hører Han på deg.\" Gutten: \"Og hva om man ber veldig høyt?\" Presten: \"Da svarer Han kanskje.\" Gutten: \"Og hvis jeg roper?\" Presten: \"Da kommer naboen løpende.\"",
+        "En konfirmant forteller: \"Gud er overalt.\" Læreren: \"Bra! Kan du gi et eksempel?\" Konfirmanten: \"Han er sikkert bak kateteret ditt nå, og håper du ikke gir lekser.\"",
+        "En mann sliter med å be. Presten sier: \"Bare snakk til Ham som til en venn.\" Mannen prøver: \"Hei, Gud. Det er meg. Jeg trenger Wi-Fi-passord.\"",
+        "En prest, en rabbi og en imam sitter i en båt. Presten sier: \"Jeg skal hente mat\" og går på vannet. Rabbinen gjør det samme. Imamen tenker: \"Hvis de kan, kan jeg også\" – og synker. Rabbinen hvisker til presten: \"Burde vi ha fortalt ham om steinene under overflaten?\"",
+        "Mor ber sønnen gå i kirken. Han sier: \"Alle hater meg der.\" Mor: \"Nonsens. Du er bare 35 år – det er aldri for sent å begynne.\"",
+        "En liten jente spør: \"Mamma, er Gud en mann eller kvinne?\" Mamma: \"Begge deler, kjære.\" Jenta: \"Og er Gud svart eller hvit?\" Mamma: \"Begge deler.\" Jenta: \"Mamma... er ikke det Michael Jackson?\"",
+        "En munk mediterer i to timer. En elev spør: «Hva tenkte du på?» Munken: «Lunsj.»",
+        "En imam, en rabbi og en prest diskuterer når livet begynner. Imamen: «Ved befruktning.» Rabbinen: «Etter fødselen.» Presten: «Når barna flytter hjemmefra og hunden dør.»",
+        "En konfirmant spør presten: «Er det synd å spise sjokolade i kirken?» Presten: «Nei.» Konfirmanten: «Hva med under preken din?»",
+        "En gutt ber: «Kjære Gud, ta vare på mamma, pappa og søsteren min.» Neste dag: «Og hunden jeg glemte – han biter ikke, lover.»",
+        "En prest og en lege spiller golf. Presten bommer igjen og roper: «Faen ta!» Legen: «Vær forsiktig med det.» Lynet slår ned ved siden av legen. En stemme fra himmelen: «Faen ta!»",
+        "En dame ber hver dag om å vinne i lotto. Etter ti år hører hun Guds stemme: «Møt meg halvveis – kjøp i det minste en lapp.»",
+        "En mann havner i himmelen og spør Petrus: «Er det noen fra politikken her?» Petrus: «Ja, men det er ikke mange – de hadde ikke råd til inngangsbilletten.»",
+        "En nonne spør en annen nonne: «Hva er verst – fattigdom, kyskhet eller lydighet?» Den andre svarer: «Å, er det valg?»",
+      ],
+    };
+
+    let sisteVitsIndex = -1;
+    let sisteKategori = null;
+    let aktivVits = null;
+
+    function tilfeldigVits(kategori) {
+      let pool;
+      let kategorinavn;
+
+      if (kategori === 'alle') {
+        const alleKategorier = Object.keys(vitser);
+        const tilfeldigKategori = alleKategorier[Math.floor(Math.random() * alleKategorier.length)];
+        pool = vitser[tilfeldigKategori];
+        kategorinavn = tilfeldigKategori;
+      } else {
+        pool = vitser[kategori];
+        kategorinavn = kategori;
+      }
+
+      let indeks;
+      do {
+        indeks = Math.floor(Math.random() * pool.length);
+      } while (pool.length > 1 && indeks === sisteVitsIndex && kategorinavn === sisteKategori);
+
+      sisteVitsIndex = indeks;
+      sisteKategori = kategorinavn;
+      return { tekst: pool[indeks], kategori: kategorinavn };
+    }
+
+    const kategorinavnMap = {
+      barna: 'Alle barna',
+      kari: 'Kari-Kari',
+      bedre: 'Det er bedre..',
+      blondine: 'Blondinevitser',
+      horthom: 'Har du hørt om..',
+      religiose: 'Religiøse vitser',
+    };
+
+    function nyVits() {
+      const valgt = document.getElementById('categorySelect').value;
+      const resultat = tilfeldigVits(valgt);
+      aktivVits = resultat.tekst;
+
+      const jokeBox = document.getElementById('jokeBox');
+      const jokeText = document.getElementById('jokeText');
+      const badge = document.getElementById('categoryBadge');
+
+      jokeBox.classList.remove('flash');
+      void jokeBox.offsetWidth;
+      jokeBox.classList.add('flash');
+
+      jokeText.classList.remove('placeholder');
+      jokeText.textContent = resultat.tekst;
+
+      if (valgt === 'alle') {
+        badge.textContent = kategorinavnMap[resultat.kategori] || resultat.kategori;
+        badge.classList.add('visible');
+      } else {
+        badge.classList.remove('visible');
+      }
+
+      const copyBtn = document.getElementById('copyBtn');
+      copyBtn.classList.remove('copied');
+      copyBtn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Kopier`;
+    }
+
+    function kopierVits() {
+      if (!aktivVits) return;
+
+      navigator.clipboard.writeText(aktivVits).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.classList.add('copied');
+        btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Kopiert!`;
+        setTimeout(() => {
+          btn.classList.remove('copied');
+          btn.innerHTML = `<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Kopier`;
+        }, 2500);
+      });
+    }
+  </script>
+
+</body>
+</html>
